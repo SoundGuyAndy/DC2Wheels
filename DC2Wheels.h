@@ -33,9 +33,9 @@
 //machine motion state
 #define IDLE 0 //It sights machine is stopped
 #define FORWARD 1 //It sights machine is moving to forward
-#define BACKWARD 2 //It sights machine is moving to backward
+#define REVERSE 2 //It sights machine is moving to backward
 #define RESISTENCE_DEFAULT 0 //Perfect world resistance
-#define BEND_SMOOTH_DEFAULT 0.0 //Bend smooth value default does't attenuate nothing
+#define TURN_SMOOTH_DEFAULT 0.0 //Bend smooth value default does't attenuate nothing
 #define MAXIMUM_SPEED 255 // Max duty cycle for PWM
 #define MINIMUM_SPEED 0 //Minimum duty cycle for PWM value of *STOPED
 #define FRONT_POSITION 0 //Sight the array position to indicate front pin for well
@@ -47,23 +47,23 @@ class DC2Wheels {
 public:
 	int _speed; //Holds the actual machine' speed
 	int _direction; //Holds the actual motion direction of machine
-	double _resistence; //Holds the resistance from middle into the wheels, in a ideal scenery it is zero
+	double _resistance; //Holds the resistance from middle into the wheels, in a ideal scenery it is zero
 	float _bendSmooth; //Holds the smooth value to attenuate bends movies
 
 	/*Both constructors needs: the Arduino's pin in which the right Servo is plugged in,
 	 the Arduino's pin in which the left Servo is plugged in,
 	 The Radius of machine's wheels,
-	 The Bend Radius, Bend radius is the length value from one wheel to another, the machine shaft length
+	 The Turn Radius, Turn radius is the length value from one wheel to another, the machine shaft length
 
 	 The first constructor to work in a ideal scenery, without resistance, the second needs to set a resistance value,
-	 and the last sets bend smooth too
+	 and the last sets turn smooth too
 	 */
 	DC2Wheels(int *rightWhreelPins, int *leftWhreelPins, double wheellRadius,
-			double bendRadius);
+			double turnRadius);
 	DC2Wheels(int *rightWhreelPins, int *leftWhreelPins, double wheellRadius,
-			double bendRadius, double resistence);
+			double turnRadius, double resistance);
 	DC2Wheels(int *rightWhreelPins, int *leftWhreelPins, double wheellRadius,
-			double bendRadius, double resistence, float bendSmooth);
+			double turnRadius, double resistance, float turnSmooth);
 
 	/*
 	 speed* must be higher or equal to 0 and lower or equal to 100, is a percent
@@ -79,24 +79,24 @@ public:
 	void stop(); //Method to stop the machine
 	void forward(int speed); //Method to move the machine forward in a certain speed*
 	void forward(int speed, double distance); //Method to move the machine forward in a certain speed* to a distance*
-	void backward(int speed); //Method to move the machine backward in a certain speed*
-	void backward(int speed, double distance); //Method to move the machine backward in a certain speed* to a distance*
-	void bend(int degree); //Method to make a bend with the passed degree*** value, the degree sigh will determine the bend side
-	void rigthBend(int degree); //Method to make a right bend with the passed degree**** value
-	void leftBend(int degree); //Method to make a left bend with the passed degree**** value
+	void reverse(int speed); //Method to move the machine backward in a certain speed*
+	void reverse(int speed, double distance); //Method to move the machine backward in a certain speed* to a distance*
+	void turn(int degree); //Method to make a bend with the passed degree*** value, the degree sigh will determine the bend side
+	void rightTurn(int degree); //Method to make a right bend with the passed degree**** value
+	void leftTurn(int degree); //Method to make a left bend with the passed degree**** value
 	void spin(int degree); //Method to spin the machine in its own axis, the sign of param will determine the spin direction
 	void spin(int degree, int speed); //Method to spin the machine in its own axis, the sign of param will determine the spin direction and in a certain speed*
 	//Auxiliary methods
 	int getSpeed(); //Method to get the speed value
 	int getDirection(); //Method to get direction value
-	float getBendSmooth(); //Method to get the bend smooth value
-	void setBendSmooth(float smooth); //Method to set the bend smooth***** value
+	float getTurnSmooth(); //Method to get the bend smooth value
+	void setTurnSmooth(float smooth); //Method to set the bend smooth***** value
 
 private:
 	int *_rightWheelPins; //Holds the pins which will work with the right wheel
 	int *_leftWheelPins; //Holds the pins object which will work with the left wheel
 	double _wheelRadius; //Holds the wheel radios value
-	double _bendRadius; //Holds the bend radius value
+	double _turnRadius; //Holds the bend radius value
 
 	int getWheelSpeed(int speed, int wheel); //Private method used to calculate the speed value to a specific wheel
 	double degreeToRadian(int degree); //Method to convert degrees to radians
@@ -104,6 +104,6 @@ private:
 	double getWalkDisplacement(double distance); //Method to calculate the machine distance displacement
 	double circleLength(double radius); //Method to calculate the length  for an circle
 	unsigned long getWaitValue(double desplacement, int speed); //Method to calculate among of time to wait until the displacement is walked
-	int speedFormater(int speed); //Method to format the speed to a valid speed value
+	int speedFormatter(int speed); //Method to format the speed to a valid speed value
 };
 #endif
