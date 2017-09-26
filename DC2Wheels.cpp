@@ -28,50 +28,50 @@
 /********************************************************************
  * IMPLEMENTATION OF PUBLIC METHODS
  ********************************************************************/
-DC2Wheels::DC2Wheels(int *rightWhreelPins, int *leftWhreelPins,
-		double wheellRadius, double bendRadius) {
+DC2Wheels::DC2Wheels(int *rightWheelPins, int *leftWheelPins,
+		double wheelRadius, double turnRadius) {
 	//attaching referred pins to associative wheels
-	_rightWheelPins = rightWhreelPins;
-	_leftWheelPins = leftWhreelPins;
+	_rightWheelPins = rightWheelPins;
+	_leftWheelPins = leftWheelPins;
 	stop();
 	//Setting the initial values
-	_wheelRadius = wheellRadius;
-	_bendRadius = bendRadius;
+	_wheelRadius = wheelRadius;
+	_turnRadius = turnRadius;
 	//Setting the resistance value
-	_resistence = RESISTENCE_DEFAULT;
+	_resistance = RESISTANCE_DEFAULT;
 	//Setting the bend smooth
-	_bendSmooth = BEND_SMOOTH_DEFAULT;
+	_turnSmooth = TURN_SMOOTH_DEFAULT;
 }
 
-DC2Wheels::DC2Wheels(int *rightWhreelPins, int *leftWhreelPins,
-		double wheellRadius, double bendRadius, double resistence) {
+DC2Wheels::DC2Wheels(int *rightWheelPins, int *leftWheelPins,
+		double wheelRadius, double turnRadius, double resistance) {
 	//attaching referred pins to associative wheels
-	_rightWheelPins = rightWhreelPins;
-	_leftWheelPins = leftWhreelPins;
+	_rightWheelPins = rightWheelPins;
+	_leftWheelPins = leftWheelPins;
 	stop();
 	//Setting the initial values
-	_wheelRadius = wheellRadius;
-	_bendRadius = bendRadius;
+	_wheelRadius = wheelRadius;
+	_turnRadius = turnRadius;
 	//Setting the resistance value
-	_resistence = resistence;
+	_resistance = resistance;
 	//Setting the bend smooth
-	_bendSmooth = BEND_SMOOTH_DEFAULT;
+	_turnSmooth = TURN_SMOOTH_DEFAULT;
 }
 
-DC2Wheels::DC2Wheels(int *rightWhreelPins, int *leftWhreelPins,
-		double wheellRadius, double bendRadius, double resistence,
-		float bendSmooth) {
+DC2Wheels::DC2Wheels(int *rightWheelPins, int *leftWheelPins,
+		double wheelRadius, double turnRadius, double resistance,
+		float turnSmooth) {
 	//attaching referred pins to associative wheels
-	_rightWheelPins = rightWhreelPins;
-	_leftWheelPins = leftWhreelPins;
+	_rightWheelPins = rightWheelPins;
+	_leftWheelPins = leftWheelPins;
 	stop();
 	//Setting the initial values
-	_wheelRadius = wheellRadius;
-	_bendRadius = bendRadius;
+	_wheelRadius = wheelRadius;
+	_turnRadius = turnRadius;
 	//Setting the resistance value
-	_resistence = resistence;
+	_resistance = resistance;
 	//Setting the bend smooth
-	_bendSmooth = bendSmooth;
+	_turnSmooth = turnSmooth;
 }
 
 //Method to stop the machine
@@ -81,12 +81,12 @@ void DC2Wheels::stop() {
 		analogWrite(_rightWheelPins[i], MINIMUM_SPEED);
 		analogWrite(_leftWheelPins[i], MINIMUM_SPEED);
 	}
-	_speed = STOPED;
+	_speed = STOPPED;
 }
 
 //Method to move the machine forward in a certain speed*
 void DC2Wheels::forward(int speed) {
-	speed = speedFormater(speed);
+	speed = speedFormatter(speed);
 	_direction = FORWARD;
 	analogWrite(_rightWheelPins[BACK_POSITION], MINIMUM_SPEED);
 	analogWrite(_rightWheelPins[FRONT_POSITION], speed);
@@ -97,7 +97,7 @@ void DC2Wheels::forward(int speed) {
 
 //Method to move the machine forward in a certain speed* to a distance*
 void DC2Wheels::forward(int speed, double distance) {
-	speed = speedFormater(speed);
+	speed = speedFormatter(speed);
 	//get the walk value of wheel displacement
 	double displacement = getWalkDisplacement(distance);
 	//get the among of time to wait to reach the displacement
@@ -115,8 +115,8 @@ void DC2Wheels::forward(int speed, double distance) {
 
 //Method to move the machine backward in a certain speed*
 void DC2Wheels::backward(int speed) {
-	speed = speedFormater(speed);
-	_direction = BACKWARD;
+	speed = speedFormatter(speed);
+	_direction = REVERSE;
 	analogWrite(_rightWheelPins[FRONT_POSITION], MINIMUM_SPEED);
 	analogWrite(_rightWheelPins[BACK_POSITION], speed);
 	analogWrite(_leftWheelPins[FRONT_POSITION], MINIMUM_SPEED);
@@ -126,7 +126,7 @@ void DC2Wheels::backward(int speed) {
 
 //Method to move the machine backward in a certain speed* to a distance*
 void DC2Wheels::backward(int speed, double distance) {
-	speed = speedFormater(speed);
+	speed = speedFormatter(speed);
 	//get the walk value of wheel displacement
 	double displacement = getWalkDisplacement(distance);
 	//get the among of time to wait to reach the displacement
@@ -142,31 +142,31 @@ void DC2Wheels::backward(int speed, double distance) {
 	stop();
 }
 
-//Method to make a bend with the passed degree*** value, the degree sigh will determine the bend side
+//Method to make a turn with the passed degree*** value, the degree sign will determine the turn side
 /*
- Bends does not stop the machine, it gets the current speed value and make a appropriate bend
+ Turn does not stop the machine, it gets the current speed value and make a appropriate turn
  */
-void DC2Wheels::bend(int degree) {
+void DC2Wheels::turn(int degree) {
 	if (degree > 0) {
-		rigthBend(degree);
+		rightTurn(degree);
 	} else if (degree < 0) {
 		degree *= -1;
-		leftBend(degree);
+		leftTurn(degree);
 	}
 }
 
-//Method to make a right bend with the passed degree**** value
+//Method to make a right turn with the passed degree**** value
 /*
- Bends does not stop the machine, it gets the current speed value and make a appropriate bend
+ Turn does not stop the machine, it gets the current speed value and make a appropriate turn
  */
-void DC2Wheels::rigthBend(int degree) {
+void DC2Wheels::rightTurn(int degree) {
 	if (degree < 0) {
 		degree = 0;
 	}
-	//Get the raidians value from the degree
+	//Get the radians value from the degree
 	double radiansVal = degreeToRadian(degree);
 	//get the walk value of wheel displacement
-	double displacement = getCircleDisplacement(radiansVal, _bendRadius);
+	double displacement = getCircleDisplacement(radiansVal, _turnRadius);
 	//get the among of time to wait to reach the displacement
 	unsigned long waitValue = getWaitValue(displacement, _speed);
 	//adjust the right wheel for a bend
@@ -177,18 +177,19 @@ void DC2Wheels::rigthBend(int degree) {
 	analogWrite(_leftWheelPins[0], _speed);
 }
 
-//Method to make a left bend with the passed degree**** value
+//Method to make a left turn with the passed degree**** value
 /*
- Bends does not stop the machine, it gets the current speed value and make a appropriate bend
+ 
+Turn does not stop the machine, it gets the current speed value and make a appropriate turn
  */
-void DC2Wheels::leftBend(int degree) {
+void DC2Wheels::leftTurn(int degree) {
 	if (degree < 0) {
 		degree = 0;
 	}
-	//Get the raidians value from the degree
+	//Get the radians value from the degree
 	double radiansVal = degreeToRadian(degree);
 	//get the walk value of wheel displacement
-	double displacement = getCircleDisplacement(radiansVal, _bendRadius);
+	double displacement = getCircleDisplacement(radiansVal, _turnRadius);
 	//get the among of time to wait to reach the displacement
 	unsigned long waitValue = getWaitValue(displacement, _speed);
 	//adjust the right wheel for a bend
@@ -204,9 +205,9 @@ void DC2Wheels::spin(int degree) {
 	//Get the raidians value from the degree
 	double radiansVal = degreeToRadian(degree);
 	//get the walk value of wheel displacement now using the bend radius, it will make the machine spin in itself
-	double displacement = getCircleDisplacement(radiansVal, (_bendRadius / 2));
+	double displacement = getCircleDisplacement(radiansVal, (_turnRadius / 2));
 	//by defaul the spin is made with a half maximum speed
-	int speed = STOPED / 2;
+	int speed = STOPPED / 2;
 	//get the among of time to wait to reach the displacement
 	unsigned long waitValue = getWaitValue(displacement, speed);
 	//from the sign of passed param choice the right direction
@@ -227,7 +228,7 @@ void DC2Wheels::spin(int degree) {
 
 //Method to spin the machine in its own axis, the sign of param will determine the spin direction and in a certain speed*
 void DC2Wheels::spin(int degree, int speed) {
-	speed = speedFormater(speed);
+	speed = speedFormatter(speed);
 	spin(degree);
 }
 
@@ -241,19 +242,19 @@ int DC2Wheels::getDirection() {
 	return _direction;
 }
 
-//Method to get the bend smooth value
-float DC2Wheels::getBendSmooth() {
-	return _bendSmooth;
+//Method to get the turn smooth value
+float DC2Wheels::getTurnSmooth() {
+	return _turnSmooth;
 }
 
-//Method to set the bend smooth***** value
-void DC2Wheels::setBendSmooth(float smooth) {
+//Method to set the turn smooth***** value
+void DC2Wheels::setTurnSmooth(float smooth) {
 	if (smooth < 0.0) {
 		smooth = 0.0;
 	} else if (smooth > 1.0) {
 		smooth = 1.0;
 	}
-	_bendSmooth = smooth;
+	_turnSmooth = smooth;
 }
 
 /********************************************************************
@@ -264,20 +265,20 @@ int DC2Wheels::getWheelSpeed(int speed, int wheel) {
 	switch (_direction) {
 	default:
 	case IDLE:
-		return STOPED;
+		return STOPPED;
 		break;
 	case FORWARD:
 		if (wheel == RIGHTWHEEL) {
-			return STOPED + speed;
+			return STOPPED + speed;
 		} else {
-			return STOPED - speed;
+			return STOPPED - speed;
 		}
 		break;
 	case BACKWARD:
 		if (wheel == RIGHTWHEEL) {
-			return STOPED - speed;
+			return STOPPED - speed;
 		} else {
-			return STOPED + speed;
+			return STOPPED + speed;
 		}
 		break;
 	}
@@ -307,11 +308,11 @@ double DC2Wheels::circleLength(double radius) {
 
 //Method to calculate among of time to wait until the displacement is walked
 unsigned long DC2Wheels::getWaitValue(double displacement, int speed) {
-	return ((((displacement / speed) * MILI) * _resistence) * (1 + _bendSmooth));
+	return ((((displacement / speed) * MILI) * _resistence) * (1 + _turnSmooth));
 }
 
 //Method to format the speed to a valid speed value
-int DC2Wheels::speedFormater(int speed) {
+int DC2Wheels::speedFormatter(int speed) {
 	if (speed < 0) {
 		speed = 0;
 	} else if (speed > 100) {
